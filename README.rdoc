@@ -1,0 +1,9 @@
+= AuditedActions
+
+Rails plugin (based on v3.2) to audit user actions.
+It sends users' actions to IronMQ first and then process it with IronWorker.
+For now only Mongoid ORM is supported.
+
+This gem is still in development. Some features are not realized.
+
+This project rocks and uses MIT-LICENSE.

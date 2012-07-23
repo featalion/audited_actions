@@ -1,0 +1,6 @@
+Hello!
+<%= @current_user.email %>
+<br />
+Audited actions count: <%= @entries.count %>
+
+<%= button_to "Launch AuditedActions worker!", action: :create %>
