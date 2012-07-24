@@ -12,6 +12,7 @@ This gem is still in development. Some features are not realized.
 
      gem 'audited_actions', git: 'git://github.com/featalion/audited_actions.git'
 
+
 2. Configure AuditedActions, place the code bellow into config/initializers/audition_actions.rb
 
      module AuditedActions
@@ -28,12 +29,20 @@ This gem is still in development. Some features are not realized.
        end
      end
 
+
 3. Mount engine to your application, add to config/routes.rb
 
      mount AuditedActions::Engine, at: 'audited_actions'
 
-4. Install worker
+
+4. Add to controllers which actions may be audited
+
+     audited_actions [:view, :download], associate: {content: :container}
+
+
+5. Install worker
 
      rake audited_actions:install_worker
+
 
 This project rocks and uses MIT-LICENSE.
