@@ -7,11 +7,11 @@ require "audited_actions/version"
 Gem::Specification.new do |s|
   s.name        = "audited_actions"
   s.version     = AuditedActions::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of AuditedActions."
-  s.description = "TODO: Description of AuditedActions."
+  s.authors     = ["Yury Yantsevich"]
+  s.email       = ["yury@iron.io"]
+  s.homepage    = "http://iron.io"
+  s.summary     = "AuditedActions is Rails (3.2) plugin provided engine to audit user actions."
+  s.description = "AuditedActions."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
