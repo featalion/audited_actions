@@ -39,6 +39,12 @@ This gem is still in development. Some features are not realized.
 
      audited_actions [:view, :download], associate: {content: :container}
 
+     def view
+       @container = VideoContainer.find(params['id'])
+     end
+
+     ...
+
 
 5. Install worker
 
