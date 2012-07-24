@@ -19,6 +19,7 @@ module AuditedActions
                                   {
                                     token: conf.token,
                                     project_id: conf.project_id,
+                                    queue_name: conf.queue_name,
                                     mongo_conf: conf.mongo
                                   })
 
