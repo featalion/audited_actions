@@ -6,4 +6,36 @@ For now only Mongoid ORM is supported.
 
 This gem is still in development. Some features are not realized.
 
+== Installation
+
+Add to [code]Gemfile[/code]
+
+[code lang="ruby"]gem 'audited_actions', git: 'git://github.com/featalion/audited_actions.git'[/code]
+
+Configure AuditedActions, place the code bellow into [code lang="ruby"]"#{Rails.root}/config/initializers/audition_actions.rb"[/code].
+
+[code lang="ruby"]
+module AuditedActions
+  class Engine < Rails::Engine
+
+    config.token = 'IRON_IO_TOKEN'
+    config.project_id = 'IRON_IO_PROJECT_ID'
+    config.queue_name = 'audited_actions'
+
+    config.access_restriction_callback = nil
+    config.current_user = :current_user
+
+    config.mongo = Rails.application.config.mongo
+
+  end
+end
+[/code]
+
+Mount engine to your application, add to [code]routes.rb[/code]
+
+[code lang="ruby"]
+mount AuditedActions::Engine, at: 'audited_actions'
+[/code]
+
+
 This project rocks and uses MIT-LICENSE.
