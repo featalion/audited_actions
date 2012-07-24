@@ -15,7 +15,7 @@ queue = imq.queue(@params['queue_name'])
 qsize = queue.size
 (1..qsize).each do |_|
   msg = queue.get
-  AuditedActionsLogEntry.create!(JSON.parse(msg.body))
+  AuditedActions::AuditedActionsLogEntry.create!(JSON.parse(msg.body))
 
   msg.delete
 end

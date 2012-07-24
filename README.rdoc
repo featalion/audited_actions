@@ -32,5 +32,8 @@ This gem is still in development. Some features are not realized.
 
      mount AuditedActions::Engine, at: 'audited_actions'
 
+4. Install worker
+
+     rake audited_actions:install_worker
 
 This project rocks and uses MIT-LICENSE.
