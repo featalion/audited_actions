@@ -12,16 +12,22 @@ module AuditedActions
       @entries = AuditedActionsLogEntry.all.limit(10)
     end
 
-    def queue_worker
-      conf = AuditedAction::Engine.config
+    # launch worker
+    def create
+      conf = Engine.config
       conf.iw_client.tasks.create('AuditedActionsQueueProcessingWorker',
-                                  {token: conf.token, project_id: conf.project_id})
+                                  {
+                                    token: conf.token,
+                                    project_id: conf.project_id,
+                                    mongo_conf: conf.mongo
+                                  })
 
       flash[:notice] = "IronWorker was queued"
       redirect_to :back
     end
 
-    def schedule_worker
+    # re-schedule worker
+    def update
     end
 
     private
