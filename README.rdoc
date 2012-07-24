@@ -8,11 +8,16 @@ This gem is still in development. Some features are not realized.
 
 == Installation
 
-Add to [code]Gemfile[/code]
+Add to Gemfile
 
-[code lang="ruby"]gem 'audited_actions', git: 'git://github.com/featalion/audited_actions.git'[/code]
+[code lang="ruby"]
+gem 'audited_actions', git: 'git://github.com/featalion/audited_actions.git'
+[/code]
 
-Configure AuditedActions, place the code bellow into [code lang="ruby"]"#{Rails.root}/config/initializers/audition_actions.rb"[/code].
+Configure AuditedActions, place the code bellow into
+[code lang="ruby"]
+"#{Rails.root}/config/initializers/audition_actions.rb"
+[/code]
 
 [code lang="ruby"]
 module AuditedActions
@@ -31,7 +36,10 @@ module AuditedActions
 end
 [/code]
 
-Mount engine to your application, add to [code]routes.rb[/code]
+Mount engine to your application, add to
+[code lang="ruby"]
+routes.rb
+[/code]
 
 [code lang="ruby"]
 mount AuditedActions::Engine, at: 'audited_actions'
