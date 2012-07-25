@@ -9,7 +9,13 @@ module AuditedActions
     before_filter :set_current_user
 
     def index
-      @entries = AuditedActionsLogEntry.all.limit(10)
+      @page = params[:page].to_i
+      @per_page = (params[:per_page] || 10).to_i
+
+      @entries = AuditedActionsLogEntry.all.offset(([@page, 1].max - 1) * @per_page).limit(@per_page)
+
+      @total_entries = AuditedActionsLogEntry.all.count
+      total_pages(@total_entries, @per_page)
     end
 
     # launch worker
@@ -34,6 +40,10 @@ module AuditedActions
     private
     def set_current_user
       @current_user = send(AuditedActions::Engine.config.current_user)
+    end
+
+    def total_pages(num, per)
+      @total_pages = num / per + ((num % per == 0) ? 0 : 1)
     end
   end
 
