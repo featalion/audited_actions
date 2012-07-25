@@ -1,4 +1,5 @@
 module AuditedActions
-  class ApplicationController < ActionController::Base
+  # using main app ApplicationController
+  class ApplicationController < ::ApplicationController # ActionController::Base
   end
 end
