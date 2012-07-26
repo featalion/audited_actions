@@ -12,9 +12,11 @@ module AuditedActions
       @page = params[:page].to_i
       @per_page = (params[:per_page] || 10).to_i
 
-      @entries = AuditedActionsLogEntry.all.offset(([@page, 1].max - 1) * @per_page).limit(@per_page)
+      all_entries = AuditedActionsLogEntry.all
+      offset = ([@page, 1].max - 1) * @per_page
+      @entries = all_entries.offset(offset).limit(@per_page)
 
-      @total_entries = AuditedActionsLogEntry.all.count
+      @total_entries = all_entries.count
       total_pages(@total_entries, @per_page)
     end
 
