@@ -37,6 +37,37 @@ module AuditedActions
 
     # re-schedule worker
     def update
+      interval = params[:interval].to_i
+      if interval < 1
+        flash[:error] = "Interval must be at least one minute"
+      else
+        conf = Engine.config
+        iw_client = conf.iw_client
+
+        # TODO: add possibility to manage schedules,
+        #       cancel all schedules with worker name for now.
+        iw_client.schedules.list.each do |sch|
+          if sch.code_name == 'AuditedActionsQueueProcessingWorker'
+            iw_client.schedules.cancel(sch.id)
+          end
+        end
+
+        iw_client.schedules.create('AuditedActionsQueueProcessingWorker',
+                                   {
+                                     token: conf.token,
+                                     project_id: conf.project_id,
+                                     queue_name: conf.queue_name,
+                                     mongo_conf: conf.mongo
+                                   },
+                                   {
+                                     start_at: Time.now + 30, # launch on schedule
+                                     run_every: interval * 60, # in seconds
+                                     priority: 1 # high priority in queue
+                                   })
+        flash[:notice] = "Worker was successfully queued"
+      end
+
+      redirect_to :back
     end
 
     private
