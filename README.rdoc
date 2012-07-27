@@ -13,7 +13,7 @@ This gem is still in development. Some features are not realized.
      gem 'audited_actions', git: 'git://github.com/featalion/audited_actions.git'
 
 
-2. Configure AuditedActions, place the code bellow into config/initializers/audition_actions.rb
+2. Configure AuditedActions, place the code bellow at config/initializers/audition_actions.rb
 
      module AuditedActions
        class Engine < Rails::Engine
@@ -32,7 +32,7 @@ This gem is still in development. Some features are not realized.
 
 3. Mount engine to your application, add to config/routes.rb
 
-     mount AuditedActions::Engine, at: 'audited_actions'
+     mount AuditedActions::Engine, at: 'audited_actions' # , as: 'my_cool_name'
 
 
 4. Add to controllers which actions may be audited
@@ -51,4 +51,36 @@ This gem is still in development. Some features are not realized.
      rake audited_actions:install_worker
 
 
-This project rocks and uses MIT-LICENSE.
+6. Write your own view (and layout) if you want.
+   Place view at app/views/audited_actions/audited_actions/index.html.[erb|haml]
+   and layout at app/layouts/audited_actions/application.html.[erb|haml].
+
+   If you want to adapt your own app layout use routes with engine name:
+
+     main_app.root_path
+     audited_actions.audited_actions_path
+
+   Engine's controller is provided next instance variables in the view:
+
+     @entries # => Array[AuditedActionsLogEntry, ...] - set of the log entries in the DB
+     @total_entries # => Integer
+     @page # => Integer, default is 1
+     @per_page # => Integer, default is 10
+     @total_pages # => Integer
+
+   Accepted parameters for GET on `audited_actions` are `page` & `per_page`.
+
+   You can launch worker from your app. Use POST to `audited_actions` with no parameters to queue worker and launch ASAP.
+
+     <%= link_to 'Launch AuditedActions worker now!', {action: :create}, class: 'btn' %>
+
+   To schedule new worker PUT to `audited_actions`, accepted parameter `interval` (in minutes).
+
+     <%= form_tag(audited_actions.audited_action_path('1'), method: :put) do %>
+       <%= submit_tag "Schedule AuditedActions worker!", class: 'btn' %>
+       <%= select_tag :interval, options_for_select([['every 30 min', '30'], ['every hour', '60'],
+                                                     ['every 2 hours', '120'], ['every 4 hours', '240']]) %>
+     <% end %>
+  
+
+This project rocks and uses MIT-LICENSE (-:
