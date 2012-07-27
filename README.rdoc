@@ -60,27 +60,40 @@ This gem is still in development. Some features are not realized.
      main_app.root_path
      audited_actions.audited_actions_path
 
-   Engine's controller is provided next instance variables in the view:
+   Engine's controller is provided next instance variables in the view, supports pagination:
 
      @entries # => Array[AuditedActionsLogEntry, ...] - set of the log entries in the DB
      @total_entries # => Integer
-     @page # => Integer, default is 1
-     @per_page # => Integer, default is 10
+     @page # => Integer
+     @per_page # => Integer
      @total_pages # => Integer
 
-   Accepted parameters for GET on `audited_actions` are `page` & `per_page`.
+   Accepted parameters for GET on `audited_actions`:
+
+   * +page+ - page number to show
+   * +per_page+ - entities per page
 
    You can launch worker from your app. Use POST to `audited_actions` with no parameters to queue worker and launch ASAP.
 
      <%= link_to 'Launch AuditedActions worker now!', {action: :create}, class: 'btn' %>
 
-   To schedule new worker PUT to `audited_actions`, accepted parameter `interval` (in minutes).
+   To schedule new worker PUT to `audited_actions`
+
+   * +interval+ - run interval in minutes
+
+   <b>Be carefull</b>: when you schedule new worker plugin cancels others under project you're using at iron.io.
 
      <%= form_tag(audited_actions.audited_action_path('1'), method: :put) do %>
        <%= submit_tag "Schedule AuditedActions worker!", class: 'btn' %>
        <%= select_tag :interval, options_for_select([['every 30 min', '30'], ['every hour', '60'],
                                                      ['every 2 hours', '120'], ['every 4 hours', '240']]) %>
      <% end %>
-  
+
+
+== TODO
+
+1. Add tests.
+
+2. Add schedule configuration feature which could be built-in to the main app.
 
 This project rocks and uses MIT-LICENSE (-:
