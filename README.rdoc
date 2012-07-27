@@ -13,7 +13,7 @@ This gem is still in development. Some features are not realized.
      gem 'audited_actions', git: 'git://github.com/featalion/audited_actions.git'
 
 
-2. Configure AuditedActions, place the code bellow at config/initializers/audition_actions.rb
+2. Configure AuditedActions, place the code bellow at +config/initializers/audition_actions.rb+
 
      module AuditedActions
        class Engine < Rails::Engine
@@ -30,7 +30,7 @@ This gem is still in development. Some features are not realized.
      end
 
 
-3. Mount engine to your application, add to config/routes.rb
+3. Mount engine to your application, add to +config/routes.rb+
 
      mount AuditedActions::Engine, at: 'audited_actions' # , as: 'my_cool_name'
 
@@ -52,8 +52,8 @@ This gem is still in development. Some features are not realized.
 
 
 6. Write your own view (and layout) if you want.
-   Place view at app/views/audited_actions/audited_actions/index.html.[erb|haml]
-   and layout at app/layouts/audited_actions/application.html.[erb|haml].
+   Place view at +app/views/audited_actions/audited_actions/index.html.[erb|haml]+
+   and layout at +app/layouts/audited_actions/application.html.[erb|haml]+.
 
    If you want to adapt your own app layout use routes with engine name:
 
