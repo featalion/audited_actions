@@ -52,8 +52,8 @@ This gem is still in development. Some features are not realized.
 
 
 6. Write your own view (and layout) if you want.
-   Place view at +app/views/audited_actions/audited_actions/index.html.[erb|haml]+
-   and layout at +app/layouts/audited_actions/application.html.[erb|haml]+.
+   Place view at <tt>app/views/audited_actions/audited_actions/index.html.[erb|haml]</tt>
+   and layout at <tt>app/layouts/audited_actions/application.html.[erb|haml]</tt>.
 
    If you want to adapt your own app layout use routes with engine name:
 
