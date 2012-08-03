@@ -10,7 +10,7 @@ module AuditedActions
 
     def index
       @page = params[:page].to_i
-      @per_page = [params[:per_page].to_i, 1].max
+      @per_page = [(params[:per_page] || 10).to_i, 1].max
 
       all_entries = AuditedActionsLogEntry.all
       offset = ([@page, 1].max - 1) * @per_page
