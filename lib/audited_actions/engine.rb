@@ -5,21 +5,47 @@ module AuditedActions
     isolate_namespace AuditedActions
 
     initializer "audited_actions.after_config" do |app|
-      config.current_user = (config.current_user || :current_user).to_sym
+      # current_user
+      config.current_user = if config.respond_to?(:current_user)
+        (config.current_user || :current_user).to_sym
+      else
+        :current_user
+      end
 
-      arc = config.access_restriction_callback
-      config.access_restriction_callback = arc ? arc.to_sym : nil
+      # access_restriction_callback
+      config.access_restriction_callback =
+        if config.respond_to?(:access_restriction_callback)
+          arc = config.access_restriction_callback
 
-      config.queue_name = config.queue_name ? config.queue_name.to_s : 'audited_actions'
+          arc ? arc.to_sym : nil
+        else
+          nil
+        end
 
-      config.known_models = case config.known_models.class == Array
-                            when Array
-                              config.known_models
-                            when Class
-                              [config.known_models]
-                            else
-                              [Mongoid::Document]
-                            end
+      # queue_name
+      config.queue_name = if config.respond_to?(:queue_name)
+        config.queue_name ? config.queue_name.to_s : 'audited_actions'
+      else
+        'audited_actions'
+      end
+
+      # known_models, only Classes are allowed values
+      config.known_models =
+        if config.respond_to?(:known_models)
+          case config.known_models.class
+          when Array
+            km = config.known_models << Mongoid::Document
+            km.uniq!
+            km.delete_if { |m| m.class != Class }
+            km
+          when Class
+            [config.known_models, Mongoid::Document].uniq
+          else
+            [Mongoid::Document]
+          end
+        else
+          [Mongoid::Document]
+        end
 
 
       config.sender = AuditedActions::IronMQSender.new(config)
