@@ -3,11 +3,13 @@ require 'iron_mq'
 
 module AuditedActions
   class IronMQSender
-    def initialize(opts)
-      imq = IronMQ::Client.new({ token: opts.token,
-                                 project_id: opts.project_id })
-      @imqueue = imq.queue(opts.queue_name)
-      puts "IronMQSender was initialized, selected queue: #{opts.queue_name}"
+    def initialize(config)
+      imq = IronMQ::Client.new({ token: config.token,
+                                 project_id: config.project_id })
+      @imqueue = imq.queue(config.queue_name)
+      puts "IronMQSender was initialized, selected queue: #{config.queue_name}"
+
+      @known_models = config.known_models
     end
 
     def push(data)
@@ -37,6 +39,12 @@ module AuditedActions
       end
 
       data
+    end
+
+    def model?(variable)
+      return false if (variable.class.ancestors & @known_models).empty?
+
+      true
     end
 
   end
