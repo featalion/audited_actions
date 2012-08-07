@@ -24,6 +24,7 @@ This gem is still in development. Some features are not realized.
 
          config.access_restriction_callback = nil
          config.current_user = :current_user
+         config.known_models = Mongoid::Document # ancestors class (or list of classes)
 
          config.mongo = Rails.application.config.mongo # Hash to configure mongoid
        end
@@ -92,7 +93,7 @@ This gem is still in development. Some features are not realized.
 
 == TODO
 
-1. Add tests.
+1. Add functional tests.
 
 2. Add schedule configuration feature which could be built-in to the main app.
 
