@@ -15,6 +15,8 @@ module AuditedActions
     field :_associations, type: Hash
     #attr_readonly :_associations
 
+    field :audited_at, type: DateTime
+
     # belongs_to :user
     def actor
       _actor['__klass'].constantize.find(_actor['__id']) rescue nil

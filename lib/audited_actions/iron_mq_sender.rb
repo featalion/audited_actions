@@ -18,8 +18,9 @@ module AuditedActions
 
     private
     def prepare(data)
-      # HACK: check is object a model by responding to `id` method
-      unless data[:_actor].respond_to?(:id)
+      data[:audited_at] = Time.now
+
+      unless model?(data[:_actor])
         raise "User class must be a model!"
       end
 
@@ -29,8 +30,7 @@ module AuditedActions
       }
 
       data[:_associations].each do |name, assoc|
-        # HACK: check is object a model by responding to `id` method
-        if assoc.respond_to?(:id)
+        if model?(assoc)
           data[:_associations][name] = {
             __klass: assoc.class.name,
             __id: assoc.id.to_s
