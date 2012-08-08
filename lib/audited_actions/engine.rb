@@ -53,6 +53,12 @@ module AuditedActions
                                                     project_id: config.project_id)
     end
 
+    def self.known_model?(variable)
+      return false if (variable.class.ancestors & config.known_models).empty?
+
+      true
+    end
+
   end
 
 end

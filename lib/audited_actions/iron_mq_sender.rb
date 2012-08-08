@@ -8,8 +8,6 @@ module AuditedActions
                                  project_id: config.project_id })
       @imqueue = imq.queue(config.queue_name)
       puts "IronMQSender was initialized, selected queue: #{config.queue_name}"
-
-      @known_models = config.known_models
     end
 
     def push(data)
@@ -20,7 +18,7 @@ module AuditedActions
     def prepare(data)
       data[:audited_at] = Time.now
 
-      unless model?(data[:_actor])
+      unless Engine.known_model?(data[:_actor])
         raise "User class must be a model!"
       end
 
@@ -30,7 +28,7 @@ module AuditedActions
       }
 
       data[:_associations].each do |name, assoc|
-        if model?(assoc)
+        if Engine.known_model?(assoc)
           data[:_associations][name] = {
             __klass: assoc.class.name,
             __id: assoc.id.to_s
@@ -39,12 +37,6 @@ module AuditedActions
       end
 
       data
-    end
-
-    def model?(variable)
-      return false if (variable.class.ancestors & @known_models).empty?
-
-      true
     end
 
   end

@@ -19,16 +19,17 @@ module AuditedActions
 
     # belongs_to :user
     def actor
-      @actor ||= _actor['__klass'].constantize.find(_actor['__id']) rescue nil
+      @actor ||= find_associated_model(_actor)
     end
 
     def method_missing(method, *args)
       @associated_models ||= {}
       meth_s = method.to_s
       # associated model and was found?
-      return @associated_models[meth_s] if @associated_models[meth_s]
+      return @associated_models[meth_s] if @associated_models.has_key?(meth_s)
       # try to find method name in the associations
-      if aattr = _associations[meth_s]
+      if _associations.has_key?(meth_s)
+        aattr = _associations[meth_s]
         if model?(aattr)
           @associated_models[meth_s] = find_associated_model(aattr)
         else
@@ -48,9 +49,17 @@ module AuditedActions
       end
     end
 
+    def self.by_actor(user)
+      if Engine.known_model?(user)
+        where(_actor: {__klass: user.class.name, __id: user.id}.to_json)
+      else
+        raise "Audited Actions: user must be known model"
+      end
+    end
+
     private
-    def model?(var)
-      var.is_a?(Hash) && var['__klass'] && var['__id']
+    def model?(variable)
+      variable.is_a?(Hash) && variable['__klass'] && variable['__id']
     end
 
     def find_associated_model(opts)
