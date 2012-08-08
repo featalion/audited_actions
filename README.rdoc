@@ -76,7 +76,7 @@ This gem is still in development. Some features are not realized.
 
    You can launch worker from your app. Use POST to `audited_actions` with no parameters to queue worker and launch ASAP.
 
-     <%= link_to 'Launch AuditedActions worker now!', {action: :create}, class: 'btn' %>
+     <%= button_to 'Launch AuditedActions worker now!', {action: :create, method: :post}, class: 'btn' %>
 
    To schedule new worker PUT to `audited_actions`
 
