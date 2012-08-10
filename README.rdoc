@@ -1,8 +1,8 @@
 = AuditedActions
 
-Rails plugin (based on v3.2) to audit user actions.
-It sends users' actions to IronMQ first and then process it with IronWorker.
-For now only Mongoid ORM is supported.
+Rails plugin (based on v3.2) to audit users' actions.
+It sends users' actions to IronMQ first and then process them by IronWorker and save to the DB.
+For now only Mongoid ORM is supported as DB for storing audited actions.
 
 This gem is still in development. Some features are not realized.
 
@@ -24,12 +24,13 @@ This gem is still in development. Some features are not realized.
 
          config.access_restriction_callback = nil
          config.current_user = :current_user
-         config.known_models = Mongoid::Document # ancestors class (or list of classes)
+         config.known_models = Mongoid::Document # ancestor class (or Array of classes)
 
          config.mongo = Rails.application.config.mongo # Hash to configure mongoid
        end
      end
 
+   Change +'IRON_IO_TOKEN'+ and +'IRON_IO_PROJECT_ID'+ to right iron.io credentials.
 
 3. Mount engine to your application, add to +config/routes.rb+
 
@@ -56,12 +57,12 @@ This gem is still in development. Some features are not realized.
    Place view at <tt>app/views/audited_actions/audited_actions/index.html.[erb|haml]</tt>
    and layout at <tt>app/layouts/audited_actions/application.html.[erb|haml]</tt>.
 
-   If you want to adapt your own app layout use routes with engine name:
+   If you want to adapt your own app layout instead create a new one use routes with Rails engines' names:
 
      main_app.root_path
      audited_actions.audited_actions_path
 
-   Engine's controller is provided next instance variables in the view, supports pagination:
+   Engine's controller supports pagination and provides next instance variables in the view:
 
      @entries # => Array[AuditedActionsLogEntry, ...] - set of the log entries from the DB
      @total_entries # => Integer
@@ -82,7 +83,7 @@ This gem is still in development. Some features are not realized.
 
    * +interval+ - run interval in minutes
 
-   <b>Be carefull</b>: when you schedule new worker plugin cancels others under project you're using at iron.io.
+   <b>Be carefull:</b> when you create new schedule of worker plugin cancels others (only with the same worker name of course) under project you're using at iron.io.
 
      <%= form_tag(audited_actions.audited_action_path('1'), method: :put) do %>
        <%= submit_tag "Schedule AuditedActions worker!", class: 'btn' %>
@@ -91,10 +92,47 @@ This gem is still in development. Some features are not realized.
      <% end %>
 
 
+== Features
+
+=== Associations with models recognition
+
+Main association for any audited action is user model you are using in your app and names +actor+.
+By default plugin gets current actor by +current_user+ method call.
+If you are using another method just pass its name (string or symbol) to +config.current_user+ in the plugin initializer from step 2.
+
+When you associate any data with the action with +associate+ parameter the plugin try to check is it model or not.
+The same mechanism is used for +actor+.
+To extend the list of ORMs you want to recognize just add their base classes as +config.known_models+ in app's initializer.
+
+<b>Note:</b> Mongoid::Document would be included to the list automatically.
+
+<b>Warning:</b> any ORM you added must support +id+ and +find+ method.
+It is because plugin provides automatically association loading thru +ORMClass.find(id)+ call.
+
+Other associations would be converted to JSON and then back and stored to the DB as Hash field.
+
+In your app you will be able to use log entries documents from DB.
+Associations are available by name and automatically loaded and instantiated as one of known ORMs' models.
+
+  log_entry = AuditedActions::AuditedActionsLogEntry.where(audited_at: {:$gte => 3.days.ago}).first # => Mongoid::Document
+  log_entry.actor # => KnownModel (Mongoid::Document, ActiveRecord::Base, etc.)
+  log_entry.my_association_name # => KnownModel
+
++AuditedActionsLogEntry+ also supports special scope +by_actor+
+
+  actor = User.first # User must have one of known models as ancestor
+  AuditedActions::AuditedActionsLogEntry.by_actor(actor).where(controller: 'files') # supports chain filtering
+
+Sometimes loaded associations might be unavailable in the DB. You can reload associations of log entry by +reload_associations+ method.
+
+<b>Note:</b> when association (ORM model document/record) is not found it returns +nil+.
+
 == TODO
 
 1. Add functional tests.
 
 2. Add schedule configuration feature which could be built-in to the main app.
+
+3. Support different ORMs to store audited actions log entries. Configurable from engine's config (initializer).
 
 This project rocks and uses MIT-LICENSE (-:
