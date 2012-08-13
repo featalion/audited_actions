@@ -27,7 +27,7 @@ module AuditedActions
         __id: data[:_actor].id.to_s
       }
 
-      data[:_associations].each do |name, assoc|
+      (data[:_associations] || {}).each do |name, assoc|
         if Engine.known_model?(assoc)
           data[:_associations][name] = {
             __klass: assoc.class.name,
