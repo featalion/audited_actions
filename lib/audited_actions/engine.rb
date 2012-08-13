@@ -59,6 +59,23 @@ module AuditedActions
       true
     end
 
+    def self.audit!(actor, associations, data)
+      raise "AuditedActions was not initialized" unless config.respond_to?(:sender)
+      raise "AuditedActions: `associations` must be Hash" if associations.class != Hash
+      raise "AuditedActions: `data` must be Hash" if data.class != Hash
+
+      data_to_log = {
+        _actor: actor,
+        _associations: associations,
+        controller: data[:controller],
+        action: data[:action],
+        action_object_id: data[:id],
+        fullpath: data[:fullpath],
+      }
+
+      config.sender.push(data_to_log)
+    end
+
   end
 
 end
