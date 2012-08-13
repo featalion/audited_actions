@@ -19,7 +19,11 @@ module AuditedActions
 
         include AuditedActions::ActionControllerMethods::LocalInstanceMethods
 
-        after_filter :log_audited_action, only: args
+        if opts[:before_action]
+          before_filter :log_audited_action, only: args
+        else
+          after_filter :log_audited_action, only: args
+        end
       end
 
       def audited_actions_parse_associations(associations)
