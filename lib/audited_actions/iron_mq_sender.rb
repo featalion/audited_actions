@@ -16,6 +16,10 @@ module AuditedActions
 
     private
     def prepare(data)
+      if data.class != Hash
+        raise "AuditedActions::IronMQSender.push(): `data` must be Hash"
+      end
+
       data[:audited_at] = Time.now
 
       unless Engine.known_model?(data[:_actor])
@@ -27,7 +31,8 @@ module AuditedActions
         __id: data[:_actor].id.to_s
       }
 
-      (data[:_associations] || {}).each do |name, assoc|
+      data[:_associations] ||= {}
+      data[:_associations].each do |name, assoc|
         if Engine.known_model?(assoc)
           data[:_associations][name] = {
             __klass: assoc.class.name,

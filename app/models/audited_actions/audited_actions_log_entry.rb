@@ -28,7 +28,7 @@ module AuditedActions
       # associated model and was found?
       return @associated_models[meth_s] if @associated_models.has_key?(meth_s)
       # try to find method name in the associations
-      if _associations.has_key?(meth_s)
+      if association?(meth_s)
         aattr = _associations[meth_s]
         if model?(aattr)
           @associated_models[meth_s] = find_associated_model(aattr)
@@ -47,6 +47,10 @@ module AuditedActions
           @associated_models[name] = find_associated_model(value)
         end
       end
+    end
+
+    def association?(method)
+      _associations.has_key?(method.to_s)
     end
 
     def self.by_actor(user)
