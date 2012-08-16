@@ -25,10 +25,10 @@ module AuditedActions
 
       def audited_actions_store_actions_data(actions, options)
         cattr_accessor :audited_actions_actor_for
-        self.audited_actions_actor_for = {}
+        self.audited_actions_actor_for ||= {}
 
         cattr_accessor :audited_actions_associations_for
-        self.audited_actions_associations_for = {}
+        self.audited_actions_associations_for ||= {}
 
         actor = (options[:actor] || AuditedActions::Engine.config.current_user).to_sym
         associations = audited_actions_parse_associations(options[:associate])
