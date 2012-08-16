@@ -8,14 +8,11 @@ module AuditedActions
     module ClassMethods
       def audited_actions(*args)
         opts = args.extract_options!
+        # All argumets before options are actions,
+        # parse and symbolize them
+        actions = args.flatten.map { |arg| arg.to_sym }
 
-        cattr_accessor :audited_action_actor
-        actor = opts[:actor] || AuditedActions::Engine.config.current_user
-        self.audited_action_actor = actor.to_sym
-
-        cattr_accessor :audited_action_associations
-        self.audited_action_associations =
-          audited_actions_parse_associations(opts[:associate])
+        audited_actions_store_actions_data(actions, opts)
 
         include AuditedActions::ActionControllerMethods::LocalInstanceMethods
 
@@ -25,6 +22,24 @@ module AuditedActions
           after_filter :log_audited_action, only: args
         end
       end
+
+      def audited_actions_store_actions_data(actions, options)
+        cattr_accessor :audited_actions_actor_for
+        self.audited_actions_actor_for = {}
+
+        cattr_accessor :audited_actions_associations_for
+        self.audited_actions_associations_for = {}
+
+        actor = (options[:actor] || AuditedActions::Engine.config.current_user).to_sym
+        associations = audited_actions_parse_associations(options[:associate])
+        # Set all data per action,
+        # it allows multiple calls of `audited_actions` method on controller
+        actions.each do |action|
+          self.audited_actions_actor_for[action] = actor
+          self.audited_actions_associations_for[action] = associations
+        end
+      end
+      private :audited_actions_store_actions_data
 
       def audited_actions_parse_associations(associations)
         return {} if associations.nil?
@@ -44,17 +59,21 @@ module AuditedActions
 
     module LocalInstanceMethods
       def log_audited_action
+        action_sym = params['action'].to_sym
+
         log_data = {
           # using `params` & `request` defined by Rails
           controller: params['controller'],
           action: params['action'],
           action_object_id: params['id'],
           fullpath: request.fullpath,
-          _actor: send(audited_action_actor)
+          # actor for current action
+          _actor: send(audited_actions_actor_for[action_sym])
         }
 
         associations = {}
-        audited_action_associations.each do |key, var_name|
+        # each association for current action
+        audited_actions_associations_for[action_sym].each do |key, var_name|
           associations[key] = self.instance_variable_get("@#{var_name}")
         end
         log_data[:_associations] = associations
