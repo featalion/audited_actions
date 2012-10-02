@@ -30,6 +30,9 @@ module AuditedActions
         cattr_accessor :audited_actions_associations_for
         self.audited_actions_associations_for ||= {}
 
+        cattr_accessor :audited_actions_condition_for
+        self.audited_actions_condition_for ||= {}
+
         actor = (options[:actor] || AuditedActions::Engine.config.current_user).to_sym
         associations = audited_actions_parse_associations(options[:associate])
         # Set all data per action,
@@ -37,6 +40,9 @@ module AuditedActions
         actions.each do |action|
           self.audited_actions_actor_for[action] = actor
           self.audited_actions_associations_for[action] = associations
+          if options[:if] && options[:if].is_a?(Proc)
+            self.audited_actions_condition_for[action] = options[:if]
+          end
         end
       end
       private :audited_actions_store_actions_data
@@ -60,6 +66,10 @@ module AuditedActions
     module LocalInstanceMethods
       def log_audited_action
         action_sym = params['action'].to_sym
+
+        # condition check
+        condition = audited_actions_condition_for[action_sym]
+        return if condition && !condition.call
 
         log_data = {
           # using `params` & `request` defined by Rails
