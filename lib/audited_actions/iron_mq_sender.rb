@@ -48,7 +48,7 @@ module AuditedActions
     end
 
     def prepare_model_hash(model)
-      {__klass: model.class.name, __id: assoc.id.to_s}
+      {__klass: model.class.name, __id: model.id.to_s}
     end
 
   end
