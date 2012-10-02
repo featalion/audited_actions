@@ -26,22 +26,29 @@ module AuditedActions
         raise "User class must be a model!"
       end
 
-      data[:_actor] = {
-        __klass: data[:_actor].class.name,
-        __id: data[:_actor].id.to_s
-      }
+      data[:_actor] = prepare_model_hash(data[:_actor])
 
       data[:_associations] ||= {}
       data[:_associations].each do |name, assoc|
         if Engine.known_model?(assoc)
-          data[:_associations][name] = {
-            __klass: assoc.class.name,
-            __id: assoc.id.to_s
-          }
+          data[:_associations][name] = prepare_model_hash(assoc)
+        elsif assoc.is_a?(Array)
+          # check for models in associated Array (collections workaround)
+          # accepts only models if has at least one model in
+          collection = []
+          assoc.each do |item|
+            collection << prepare_model_hash(item) if Engine.known_model?(item)
+          end
+
+          data[:_associations][name] = collection unless collection.empty?
         end
       end
 
       data
+    end
+
+    def prepare_model_hash(model)
+      {__klass: model.class.name, __id: assoc.id.to_s}
     end
 
   end

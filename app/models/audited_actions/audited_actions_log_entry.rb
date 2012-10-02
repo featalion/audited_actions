@@ -30,11 +30,9 @@ module AuditedActions
       # try to find method name in the associations
       if association?(meth_s)
         aattr = _associations[meth_s]
-        if model?(aattr)
-          @associated_models[meth_s] = find_associated_model(aattr)
-        else
-          aattr
-        end
+        m = find_and_instantiate_associated_models(aattr)
+
+        m ? (@associated_models[meth_s] = m) : aattr
       else
         # is not association
         super
@@ -43,9 +41,8 @@ module AuditedActions
 
     def reload_associations
       _associations.each do |name, value|
-        if model?(value)
-          @associated_models[name] = find_associated_model(value)
-        end
+        m = find_and_instantiate_associated_models(value)
+        @associated_models[name] = m if m
       end
     end
 
@@ -70,6 +67,22 @@ module AuditedActions
       opts['__klass'].constantize.find(opts['__id']) rescue nil
     end
 
+    def find_and_instantiate_associated_models(value)
+      result = nil
+      if model?(value)
+        result = find_associated_model(value)
+      elsif value.is_a?(Array)
+        # find and instantiate models in Arrays (collections)
+        collection = []
+        value.each do |item|
+          collection << find_associated_model(item) if model?(item)
+        end
+
+        result = collection unless collection.empty?
+      end
+
+      result
+    end
   end
 
 end
