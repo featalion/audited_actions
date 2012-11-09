@@ -52,19 +52,23 @@ module AuditedActions
           end
         end
 
-        iw_client.schedules.create('AuditedActionsQueueProcessingWorker',
-                                   {
-                                     token: conf.token,
-                                     project_id: conf.project_id,
-                                     queue_name: conf.queue_name,
-                                     mongo_conf: conf.mongo
-                                   },
-                                   {
-                                     start_at: Time.now + 30, # launch on schedule
-                                     run_every: interval * 60, # in seconds
-                                     priority: 1 # high priority in queue
-                                   })
-        flash[:notice] = "Worker was successfully queued"
+        begin
+          iw_client.schedules.create('AuditedActionsQueueProcessingWorker',
+                                     {
+                                       token: conf.token,
+                                       project_id: conf.project_id,
+                                       queue_name: conf.queue_name,
+                                       mongo_conf: conf.mongo
+                                     },
+                                     {
+                                       start_at: Time.now + 30, # launch on schedule
+                                       run_every: interval * 60, # in seconds
+                                       priority: 1 # high priority in queue
+                                     })
+          flash[:notice] = "Worker was successfully queued"
+        rescue => e
+          flash[:error] = "Install AuditedActionsQueueProcessingWorker first"
+        end
       end
 
       redirect_to :back

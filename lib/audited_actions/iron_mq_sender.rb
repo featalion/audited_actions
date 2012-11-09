@@ -16,7 +16,7 @@ module AuditedActions
 
     private
     def prepare(data)
-      if data.class != Hash
+      unless data.is_a? Hash
         raise "AuditedActions::IronMQSender.push(): `data` must be Hash"
       end
 
