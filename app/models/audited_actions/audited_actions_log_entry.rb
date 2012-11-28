@@ -30,9 +30,11 @@ module AuditedActions
       # try to find method name in the associations
       if association?(meth_s)
         aattr = _associations[meth_s]
-        m = find_and_instantiate_associated_models(aattr)
-
-        m ? (@associated_models[meth_s] = m) : aattr
+        if model?(aattr)
+          @associated_models[meth_s] = find_and_instantiate_associated_models(aattr)
+        else
+          aattr
+        end
       else
         # is not association
         super
