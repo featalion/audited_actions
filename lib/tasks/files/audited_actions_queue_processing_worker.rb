@@ -4,8 +4,14 @@ require 'json'
 
 require 'audited_actions_log_entry'
 
-Mongoid.configure do |config|
-  config.from_hash @params['mongo_conf']
+if Mongoid::VERSION.start_with? '2'
+  Mongoid.configure do |config|
+    config.from_hash @params['mongo_conf']
+  end
+elsif Mongoid::VERSION.start_with? '3'
+  Mongoid::Config.send(:load_configuration, @params['mongo_conf'])
+else
+  raise "Mongoid version #{Mongoid::VERSION} is not supported"
 end
 
 imq = IronMQ::Client.new({ token: @params['token'],
