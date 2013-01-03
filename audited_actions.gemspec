@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "~> 3.2.6"
+  s.add_dependency "rails", "~> 3.2"
   s.add_dependency "mongoid"
   s.add_dependency "iron_mq"
   s.add_dependency "iron_worker_ng"
